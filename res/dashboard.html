@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr" data-bs-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/10.0.3/jsoneditor.min.css" rel="stylesheet" type="text/css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/10.0.3/jsoneditor.min.js"></script>
+  <title>Dashboard</title>
+  <style>
+    body {
+      padding-top: 3rem;
+      font-family: "M PLUS Code Latin", monospace;
+    }
+
+    main {
+      height:500px;
+      overflow: auto;
+    }
+    main::-webkit-scrollbar{display: none;}
+
+    #header {
+      z-index:1;
+      background-color: white;
+      position: sticky;
+      top: 0px;
+    }
+
+    nav,.btn,.pico-modal-header,input[type=submit] {
+      background-color: #4B0082!important;
+      color: var(--white)!important;
+      border: none !important;
+    }
+    #action:focus,.btn:focus,input[type=submit]:focus{
+      box-shadow: 0 0 0 .2rem #D396FF!important;
+      border-color: #4B0082!important;
+      border: none !important;
+    }
+
+    label{
+      padding-top: 16px;
+    }
+
+    .container {
+      max-width: 960px;
+    }
+
+    textarea {
+      background-color: var(--gray-dark)!important;
+      color: var(--white)!important;
+    }
+
+    .form {
+      padding-inline: 32px;
+    }
+
+    #response{
+      position: sticky;
+      top: 100px;
+      padding: 16px;
+      white-space: pre-wrap;
+      border-radius:4px;
+      background-color: var(--gray-dark);
+      color: var(--white);
+      width: 80%;
+      height: 280px;
+      overflow-y: auto;
+    }
+    #response::-webkit-scrollbar{display: none;}
+
+    #jsoneditor{
+      width: 100%;
+      min-height: 200px;
+      max-height: 400px;
+      padding: 16px;
+      background-color: var(--gray-dark);
+      border-radius: 4px;
+    }
+    .jsoneditor{
+      border-radius: 4px;
+      border: none!important;
+    }
+    .jsoneditor-menu{
+      background-color: var(--gray-dark)!important;
+      border: none!important;
+      border-radius: 4px!important;
+      overflow: hidden;
+    }
+    .jsoneditor-navigation-bar{
+      background-color: var(--gray-dark)!important;
+      border-bottom: none;
+    }
+    .jsoneditor-outer > div{
+      background-color: var(--gray-dark);
+    }
+    .jsoneditor-highlight{
+      background-color: #D396FF!important;
+    }
+    .jsoneditor-highlight > :first-child{
+      border-radius: 4px 0 0 4px;
+    }
+    .jsoneditor-highlight > :last-child{
+      border-radius: 0 4px 4px 0;
+    }
+    .jsoneditor-field{
+      color: #D396FF!important;
+    }
+    .jsoneditor-field:hover,.jsoneditor-field:focus{
+      background-color: #D396FF!important;
+      color: #4B0082!important;
+      border: none!important;
+    }
+    .jsoneditor-highlight .jsoneditor-field{
+      color: #4B0082!important;
+    }
+    .jsoneditor-value{
+      color: var(--white)!important;
+    }
+    .jsoneditor-value:hover,.jsoneditor-value:focus{
+      background-color: #D396FF!important;
+      border: none!important;
+    }
+    .jsoneditor-menu li button:hover{
+      background-color: #D396FF!important;
+      color: var(--white)!important;
+    }
+    .jsoneditor-type-modes,.jsoneditor-text{
+      color: var(--white)!important;
+    }
+    .jsoneditor-jmespath-label{
+      color: #4B0082!important;
+    }
+    .jsoneditor-modal a {
+      color: #4B0082!important;
+    }
+    .jsoneditor-modal .jsoneditor-button-group.jsoneditor-button-group-value-asc input.jsoneditor-button-asc,
+    .jsoneditor-modal .jsoneditor-button-group.jsoneditor-button-group-value-desc input.jsoneditor-button-desc {
+      background: #D396FF!important;
+      border: none!important;
+      color: #fff;
+    }
+    div.jsoneditor-value.jsoneditor-array, div.jsoneditor-value.jsoneditor-object,
+    div.jsoneditor-tree button.jsoneditor-expanded,
+    button[type=button]{
+      border-radius: 4px!important;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top">
+    <span class="navbar-brand">roosevelt@roo7690.me</span>
+  </nav>
+  <main role="main" class="container">
+    <div id="header"
+      class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+      <h1 class="h2">Tableau de bord</h1>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-7 form">
+          <div class="form-group">
+            <label class="h4" for="action">Action</label>
+            <select class="form-control" id="action">
+              <option value="gt">Génerer un token</option>
+              <option value="dt">Bloquer un token</option>
+            </select>
+            <label class="h4" for="jsoneditor">Données</label>
+            <div id="jsoneditor"></div>
+          </div>
+          <button id="send" type="submit" class="btn btn-primary">Envoyer</button>
+        </div>
+        <div class="col-sm-5 d-flex justify-content-center">
+          <div id="response">Réponse de la requête</textarea>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script>
+    window.onload=()=>{
+      const send = document.getElementById("send")
+      const action = document.getElementById("action")
+      const response = document.getElementById("response")
+
+      const container = document.getElementById("jsoneditor")
+      const editor = new JSONEditor(container, {})
+
+      const initialJson = {
+          id:"root",
+          pw:"root"
+      }
+      editor.set(initialJson)
+
+      send.onclick = async ()=>{
+        let url;
+        switch(action.value){
+          case "gt":
+            url = "/dashboard/get-access"
+            break
+          case "dt":
+            url = "/dashboard/delete-access"
+            break
+          default:
+            url = "/dashboard/get-access"
+        }
+        const data= editor.get()
+        fetch(url,{
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+        }).then(res=>res.json())
+        .then(res=>response.textContent = JSON.stringify(res, null, 2))
+        .catch(err=>response.textContent = JSON.stringify(err, null, 2))
+      }
+    }
+  </script>
+</body>
+
+</html>

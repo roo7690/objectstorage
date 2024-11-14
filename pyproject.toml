@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "minio_storage"
+version = "0.1.0"
+description = ""
+authors = ["roo7690 <roosevelt@roo7690.me>"]
+license = "MIT"
+readme = "readme.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.109.2"
+uvicorn = "^0.27.0.post1"
+minio = "^7.2.3"
+python-dotenv = "^1.0.1"
+server = {path = "../../libs/python", develop = true}
+jinja2 = "^3.1.4"
+python-multipart = "^0.0.9"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

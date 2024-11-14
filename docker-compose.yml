@@ -1,0 +1,69 @@
+version: '1.0.0'
+
+networks:
+  object-storage:
+    driver: bridge
+
+x-minio-client: &minio-client
+  image: quay.io/minio/minio:latest
+  env_file:
+    - .env.local
+  networks:
+    - object-storage
+  command: server --address ":7090" --console-address ":7091" http://minio-client{1...4}/data
+
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:7090/minio/health/live"]
+    interval: 30s
+    timeout: 20s
+    retries: 3
+
+services: 
+  # Mise en place d'un cluster
+  minio-client1:
+    <<: *minio-client
+    container_name: minio1.object-storage
+    volumes:
+      - minio1_data:/data
+  
+  minio-client2:
+    <<: *minio-client
+    container_name: minio2.object-storage 
+    volumes:
+      - minio2_data:/data
+
+  minio-client3:
+    <<: *minio-client
+    container_name: minio3.object-storage
+    volumes:
+      - minio3_data:/data
+
+  minio-client4:
+    <<: *minio-client
+    container_name: minio4.object-storage
+    volumes:
+      - minio4_data:/data
+
+  entrepot:
+    container_name: nginx.object-storage
+    image: nginx.object-storage:1.1.0
+    build:
+      dockerfile: nginx.dockerfile
+    ports:
+      - '8081:8081'
+    networks:
+      - object-storage
+  
+  store:
+    container_name: store.object-storage
+    image: store.object-storage:1.1.0
+    build:
+      dockerfile: store.dockerfile
+    networks:
+      - object-storage
+
+volumes:
+  minio1_data:
+  minio2_data:
+  minio3_data:
+  minio4_data:

@@ -1,0 +1,27 @@
+{
+  "api": "server object storage",
+  "version": "1.1.0",
+  "status": "running",
+  "author": "roo7690",
+  "contact": "roosevelt@roo7690.me",
+  "welcomeMessage": "Welcome to my API server object storage!",
+  "features": [
+    "File upload",
+    "File download",
+    "File deletion"
+  ],
+  "endpoints": [
+    {
+      "url": "/upload",
+      "method": "POST"
+    },
+    {
+      "url": "/download/:filepath",
+      "method": "GET"
+    },
+    {
+      "url": "/delete",
+      "method": "POST"
+    }
+  ]
+}
