@@ -13,9 +13,11 @@ def random_string():
 
 @router.post('/upload')
 async def upload(req:Request,res:Response, \
-  file:UploadFile=File(...),to:str=Form(...)):
-  filename=to+'/'+random_string()+'.'+file.filename
+  file:UploadFile=File(...),to:str=Form(...),addId:bool=Form(True),inPublic:bool=Form(False)):
+  filename=to+'/'+(random_string()+'.' if addId else '')+file.filename
   filename=filename.replace("//","/")
+  if inPublic:
+    req.state.client_id='public'
   try:
     Manager.put_object(req.state.client_id,
       filename,file.file,file.size,
